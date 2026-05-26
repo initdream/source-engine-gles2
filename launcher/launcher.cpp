@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // Defines the entry point for the application.
 //
@@ -11,11 +11,11 @@
 #include "shlwapi.h" // registry stuff
 #include <direct.h>
 #elif defined(POSIX)
-	#define O_EXLOCK 0
-	#include <sys/types.h>
-	#include <sys/stat.h>
-	#include <fcntl.h>
-	#include <locale.h>
+#define O_EXLOCK 0
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <locale.h>
 #elif defined ( _X360 )
 #else
 #error
@@ -132,7 +132,7 @@ class CLeakDump
 {
 public:
 	CLeakDump()
-	 :	m_bCheckLeaks( false )
+	:	m_bCheckLeaks( false )
 	{
 	}
 
@@ -152,49 +152,49 @@ public:
 //-----------------------------------------------------------------------------
 SpewRetval_t LauncherDefaultSpewFunc( SpewType_t spewType, char const *pMsg )
 {
-#ifndef _CERT
-#ifdef WIN32
+	#ifndef _CERT
+	#ifdef WIN32
 	OutputDebugStringA( pMsg );
-#else
+	#else
 	fprintf( stderr, "%s", pMsg );
-#endif
-	
+	#endif
+
 	switch( spewType )
 	{
-	case SPEW_MESSAGE:
-	case SPEW_LOG:
-		return SPEW_CONTINUE;
+		case SPEW_MESSAGE:
+		case SPEW_LOG:
+			return SPEW_CONTINUE;
 
-	case SPEW_WARNING:
-		if ( !stricmp( GetSpewOutputGroup(), "init" ) )
-		{
-#if defined( WIN32 ) || defined( USE_SDL )
-			::MessageBox( NULL, pMsg, "Warning!", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
-#endif
-		}
-		return SPEW_CONTINUE;
+		case SPEW_WARNING:
+			if ( !stricmp( GetSpewOutputGroup(), "init" ) )
+			{
+				#if defined( WIN32 ) || defined( USE_SDL )
+				::MessageBox( NULL, pMsg, "Warning!", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
+				#endif
+			}
+			return SPEW_CONTINUE;
 
-	case SPEW_ASSERT:
-		if ( !ShouldUseNewAssertDialog() )
-		{
-#if defined( WIN32 ) || defined( USE_SDL )
-			::MessageBox( NULL, pMsg, "Assert!", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
-#endif
-		}
-		return SPEW_DEBUGGER;
-	
-	case SPEW_ERROR:
-	default:
-#if defined( WIN32 ) || defined( USE_SDL )
-		::MessageBox( NULL, pMsg, "Error!", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
-#endif
-		_exit( 1 );
+		case SPEW_ASSERT:
+			if ( !ShouldUseNewAssertDialog() )
+			{
+				#if defined( WIN32 ) || defined( USE_SDL )
+				::MessageBox( NULL, pMsg, "Assert!", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
+				#endif
+			}
+			return SPEW_DEBUGGER;
+
+		case SPEW_ERROR:
+		default:
+			#if defined( WIN32 ) || defined( USE_SDL )
+			::MessageBox( NULL, pMsg, "Error!", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR );
+			#endif
+			_exit( 1 );
 	}
-#else
+	#else
 	if ( spewType != SPEW_ERROR)
 		return SPEW_CONTINUE;
 	_exit( 1 );
-#endif
+	#endif
 }
 
 
@@ -206,9 +206,9 @@ class CVCRHelpers : public IVCRHelpers
 public:
 	virtual void ErrorMessage( const char *pMsg )
 	{
-#if defined( WIN32 ) || defined( LINUX ) || defined(PLATFORM_BSD)
+		#if defined( WIN32 ) || defined( LINUX ) || defined(PLATFORM_BSD)
 		NOVCR( ::MessageBox( NULL, pMsg, "VCR Error", MB_OK ) );
-#endif
+		#endif
 	}
 
 	virtual void* GetMainWindow()
@@ -238,15 +238,15 @@ void SetGameDirectory( const char *game )
 //-----------------------------------------------------------------------------
 bool GetExecutableName( char *out, int outSize )
 {
-#ifdef WIN32
+	#ifdef WIN32
 	if ( !::GetModuleFileName( ( HINSTANCE )GetModuleHandle( NULL ), out, outSize ) )
 	{
 		return false;
 	}
 	return true;
-#else
+	#else
 	return false;
-#endif
+	#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -255,11 +255,11 @@ bool GetExecutableName( char *out, int outSize )
 //-----------------------------------------------------------------------------
 char *GetBaseDirectory( void )
 {
-#ifdef ANDROID
+	#ifdef ANDROID
 	return getenv("VALVE_GAME_PATH");
-#else
+	#else
 	return g_szBasedir;
-#endif
+	#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -289,8 +289,8 @@ void UTIL_ComputeBaseDir()
 		int j = strlen( g_szBasedir );
 		if (j > 0)
 		{
-			if ( ( g_szBasedir[j-1] == '\\' ) || 
-				 ( g_szBasedir[j-1] == '/' ) )
+			if ( ( g_szBasedir[j-1] == '\\' ) ||
+				( g_szBasedir[j-1] == '/' ) )
 			{
 				g_szBasedir[j-1] = 0;
 			}
@@ -306,26 +306,26 @@ void UTIL_ComputeBaseDir()
 		}
 	}
 
-#ifdef WIN32
+	#ifdef WIN32
 	Q_strlower( g_szBasedir );
-#endif
+	#endif
 	Q_FixSlashes( g_szBasedir );
 }
 
 #ifdef WIN32
 BOOL WINAPI MyHandlerRoutine( DWORD dwCtrlType )
 {
-#if !defined( _X360 )
+	#if !defined( _X360 )
 	TerminateProcess( GetCurrentProcess(), 2 );
-#endif
+	#endif
 	return TRUE;
 }
 #endif
 
 void InitTextMode()
 {
-#ifdef WIN32
-#if !defined( _X360 )
+	#ifdef WIN32
+	#if !defined( _X360 )
 	AllocConsole();
 
 	SetConsoleCtrlHandler( MyHandlerRoutine, TRUE );
@@ -333,10 +333,10 @@ void InitTextMode()
 	freopen( "CONIN$", "rb", stdin );		// reopen stdin handle as console window input
 	freopen( "CONOUT$", "wb", stdout );		// reopen stout handle as console window output
 	freopen( "CONOUT$", "wb", stderr );		// reopen stderr handle as console window output
-#else
+	#else
 	XBX_Error( "%s %s: Not Supported", __FILE__, __LINE__ );
-#endif
-#endif
+	#endif
+	#endif
 }
 
 void SortResList( char const *pchFileName, char const *pchSearchPath );
@@ -374,8 +374,8 @@ static bool AllLogLessFunc( CUtlString const &pLHS, CUtlString const &pRHS )
 }
 
 CLogAllFiles::CLogAllFiles() :
-	m_bActive( false ),
-	m_Logged( 0, 0, AllLogLessFunc )
+m_bActive( false ),
+m_Logged( 0, 0, AllLogLessFunc )
 {
 	MEM_ALLOC_CREDIT();
 	m_sResListDir = "reslists";
@@ -407,9 +407,9 @@ void CLogAllFiles::Init()
 		char szDir[ MAX_PATH ];
 		Q_strncpy( szDir, pszDir, sizeof( szDir ) );
 		Q_StripTrailingSlash( szDir );
-#ifdef WIN32
+		#ifdef WIN32
 		Q_strlower( szDir );
-#endif
+		#endif
 		Q_FixSlashes( szDir );
 		if ( Q_strlen( szDir ) > 0 )
 		{
@@ -421,9 +421,9 @@ void CLogAllFiles::Init()
 	char path[MAX_PATH];
 	Q_snprintf( path, sizeof(path), "%s/%s", GetBaseDirectory(), CommandLine()->ParmValue( "-game", "hl2" ) );
 	Q_FixSlashes( path );
-#ifdef WIN32
+	#ifdef WIN32
 	Q_strlower( path );
-#endif
+	#endif
 	m_sFullGamePath = path;
 
 	// create file to dump out to
@@ -439,14 +439,14 @@ void CLogAllFiles::Init()
 		g_pFullFileSystem->RemoveFile( CFmtStr( "%s\\%s\\%s", m_sFullGamePath.String(), m_sResListDir.String(), ALL_RESLIST_FILE ), "GAME" );
 	}
 
-#ifdef WIN32
+	#ifdef WIN32
 	::GetCurrentDirectory( sizeof(m_szCurrentDir), m_szCurrentDir );
 	Q_strncat( m_szCurrentDir, "\\", sizeof(m_szCurrentDir), 1 );
 	_strlwr( m_szCurrentDir );
-#else
+	#else
 	getcwd( m_szCurrentDir, sizeof(m_szCurrentDir) );
 	Q_strncat( m_szCurrentDir, "/", sizeof(m_szCurrentDir), 1 );
-#endif
+	#endif
 }
 
 void CLogAllFiles::Shutdown()
@@ -509,11 +509,11 @@ void CLogAllFiles::LogFile(const char *fullPathFileName, const char *options)
 
 		char rel[ MAX_PATH ];
 		Q_strncpy( rel, relative, sizeof( rel ) );
-#ifdef WIN32
+		#ifdef WIN32
 		Q_strlower( rel );
-#endif
+		#endif
 		Q_FixSlashes( rel );
-		
+
 		LogToAllReslist( rel );
 	}
 }
@@ -527,18 +527,18 @@ void CLogAllFiles::LogAllFilesFunc(const char *fullPathFileName, const char *opt
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: This is a bit of a hack because it appears 
+// Purpose: This is a bit of a hack because it appears
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
 static bool IsWin98OrOlder()
 {
 	bool retval = false;
 
-#if defined( WIN32 ) && !defined( _X360 )
+	#if defined( WIN32 ) && !defined( _X360 )
 	OSVERSIONINFOEX osvi;
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	
+
 	BOOL bOsVersionInfoEx = GetVersionEx ((OSVERSIONINFO *) &osvi);
 	if( !bOsVersionInfoEx )
 	{
@@ -552,21 +552,21 @@ static bool IsWin98OrOlder()
 
 	switch (osvi.dwPlatformId)
 	{
-	case VER_PLATFORM_WIN32_NT:
-		// NT, XP, Win2K, etc. all OK for SSE
-		break;
-	case VER_PLATFORM_WIN32_WINDOWS:
-		// Win95, 98, Me can't do SSE
-		retval = true;
-		break;
-	case VER_PLATFORM_WIN32s:
-		// Can't really run this way I don't think...
-		retval = true;
-		break;
-	default:
-		break;
+		case VER_PLATFORM_WIN32_NT:
+			// NT, XP, Win2K, etc. all OK for SSE
+			break;
+		case VER_PLATFORM_WIN32_WINDOWS:
+			// Win95, 98, Me can't do SSE
+			retval = true;
+			break;
+		case VER_PLATFORM_WIN32s:
+			// Can't really run this way I don't think...
+			retval = true;
+			break;
+		default:
+			break;
 	}
-#endif
+	#endif
 
 	return retval;
 }
@@ -577,7 +577,7 @@ static bool IsWin98OrOlder()
 //-----------------------------------------------------------------------------
 void TryToLoadSteamOverlayDLL()
 {
-#if defined( WIN32 ) && !defined( _X360 )
+	#if defined( WIN32 ) && !defined( _X360 )
 	// First, check if the module is already loaded, perhaps because we were run from Steam directly
 	HMODULE hMod = GetModuleHandle( "GameOverlayRenderer" DLL_EXT_STRING );
 	if ( hMod )
@@ -598,18 +598,18 @@ void TryToLoadSteamOverlayDLL()
 				V_ComposeFileName( pchSteamInstallPath, "GameOverlayRenderer" DLL_EXT_STRING, rgchSteamPath, Q_ARRAYSIZE(rgchSteamPath) );
 				// This could fail, but we can't fix it if it does so just ignore failures
 				LoadLibrary( rgchSteamPath );
-			
+
 			}
 
 			SteamAPI_Shutdown();
 		}
 	}
 
-#endif
+	#endif
 }
 
 //-----------------------------------------------------------------------------
-// Inner loop: initialize, shutdown main systems, load steam to 
+// Inner loop: initialize, shutdown main systems, load steam to
 //-----------------------------------------------------------------------------
 class CSourceAppSystemGroup : public CSteamAppSystemGroup
 {
@@ -634,7 +634,7 @@ private:
 //-----------------------------------------------------------------------------
 void ReportDirtyDiskNoMaterialSystem()
 {
-#ifdef _X360
+	#ifdef _X360
 	for ( int i = 0; i < 4; ++i )
 	{
 		if ( XUserGetSigninState( i ) != eXUserSigninState_NotSignedIn )
@@ -644,7 +644,7 @@ void ReportDirtyDiskNoMaterialSystem()
 		}
 	}
 	XShowDirtyDiscErrorUI( 0 );
-#endif
+	#endif
 }
 
 
@@ -656,16 +656,16 @@ bool CSourceAppSystemGroup::Create()
 	IFileSystem *pFileSystem = (IFileSystem*)FindSystem( FILESYSTEM_INTERFACE_VERSION );
 	pFileSystem->InstallDirtyDiskReportFunc( ReportDirtyDiskNoMaterialSystem );
 
-#ifdef WIN32
+	#ifdef WIN32
 	CoInitialize( NULL );
-#endif
+	#endif
 
 	// Are we running in edit mode?
 	m_bEditMode = CommandLine()->CheckParm( "-edit" );
 
 	double st = Plat_FloatTime();
 
-	AppSystemInfo_t appSystems[] = 
+	AppSystemInfo_t appSystems[] =
 	{
 		{ "engine" DLL_EXT_STRING,			CVAR_QUERY_INTERFACE_VERSION },	// NOTE: This one must be first!!
 		{ "inputsystem" DLL_EXT_STRING,		INPUTSYSTEM_INTERFACE_VERSION },
@@ -676,7 +676,7 @@ bool CSourceAppSystemGroup::Create()
 		{ "studiorender" DLL_EXT_STRING,	STUDIO_RENDER_INTERFACE_VERSION },
 		{ "vphysics" DLL_EXT_STRING,		VPHYSICS_INTERFACE_VERSION },
 		{ "video_services" DLL_EXT_STRING,  VIDEO_SERVICES_INTERFACE_VERSION },
-  
+
 		// NOTE: This has to occur before vgui2.dll so it replaces vgui2's surface implementation
 		{ "vguimatsurface" DLL_EXT_STRING,	VGUI_SURFACE_INTERFACE_VERSION },
 		{ "vgui2" DLL_EXT_STRING,			VGUI_IVGUI_INTERFACE_VERSION },
@@ -685,13 +685,13 @@ bool CSourceAppSystemGroup::Create()
 		{ "", "" }							// Required to terminate the list
 	};
 
-#if defined( USE_SDL )
+	#if defined( USE_SDL )
 	AddSystem( (IAppSystem *)CreateSDLMgr(), SDLMGR_INTERFACE_VERSION );
-#endif
+	#endif
 
-	if ( !AddSystems( appSystems ) ) 
+	if ( !AddSystems( appSystems ) )
 		return false;
-	
+
 	// This will be NULL for games that don't support VR. That's ok. Just don't load the DLL
 	AppModule_t sourceVRModule = LoadModule( "sourcevr" DLL_EXT_STRING );
 	if( sourceVRModule != APP_MODULE_INVALID )
@@ -699,7 +699,7 @@ bool CSourceAppSystemGroup::Create()
 		AddSystem( sourceVRModule, SOURCE_VIRTUAL_REALITY_INTERFACE_VERSION );
 	}
 
-	// pull in our filesystem dll to pull the queued loader from it, we need to do it this way due to the 
+	// pull in our filesystem dll to pull the queued loader from it, we need to do it this way due to the
 	// steam/stdio split for our steam filesystem
 	char pFileSystemDLL[MAX_PATH];
 	bool bSteam;
@@ -712,16 +712,16 @@ bool CSourceAppSystemGroup::Create()
 	// Hook in datamodel and p4 control if we're running with -tools
 	if ( IsPC() && ( ( CommandLine()->FindParm( "-tools" ) && !CommandLine()->FindParm( "-nop4" ) ) || CommandLine()->FindParm( "-p4" ) ) )
 	{
-#ifdef STAGING_ONLY
+		#ifdef STAGING_ONLY
 		AppModule_t p4libModule = LoadModule( "p4lib" DLL_EXT_STRING );
 		IP4 *p4 = (IP4*)AddSystem( p4libModule, P4_INTERFACE_VERSION );
-		
+
 		// If we are running with -steam then that means the tools are being used by an SDK user. Don't exit in this case!
 		if ( !p4 && !CommandLine()->FindParm( "-steam" ) )
 		{
 			return false;
 		}
-#endif // STAGING_ONLY
+		#endif // STAGING_ONLY
 
 		AppModule_t vstdlibModule = LoadModule( "vstdlib" DLL_EXT_STRING );
 		IProcessUtils *processUtils = ( IProcessUtils* )AddSystem( vstdlibModule, PROCESS_UTILS_INTERFACE_VERSION );
@@ -737,7 +737,7 @@ bool CSourceAppSystemGroup::Create()
 	g_pEngineAPI = (IEngineAPI*)FindSystem( VENGINE_LAUNCHER_API_VERSION );
 
 	// Load the hammer DLL if we're in editor mode
-#if defined( _WIN32 ) && defined( STAGING_ONLY )
+	#if defined( _WIN32 ) && defined( STAGING_ONLY )
 	if ( m_bEditMode )
 	{
 		AppModule_t hammerModule = LoadModule( "hammer_dll" DLL_EXT_STRING );
@@ -747,7 +747,7 @@ bool CSourceAppSystemGroup::Create()
 			return false;
 		}
 	}
-#endif // defined( _WIN32 ) && defined( STAGING_ONLY )
+	#endif // defined( _WIN32 ) && defined( STAGING_ONLY )
 
 	// Load up the appropriate shader DLL
 	// This has to be done before connection.
@@ -830,7 +830,7 @@ bool CSourceAppSystemGroup::PreInit()
 	// Required to run through the editor
 	if ( m_bEditMode )
 	{
-		g_pMaterialSystem->EnableEditorMaterials();	
+		g_pMaterialSystem->EnableEditorMaterials();
 	}
 
 	StartupInfo_t info;
@@ -864,15 +864,15 @@ void CSourceAppSystemGroup::PostShutdown()
 	DisconnectTier1Libraries();
 }
 
-void CSourceAppSystemGroup::Destroy() 
+void CSourceAppSystemGroup::Destroy()
 {
 	g_pEngineAPI = NULL;
 	g_pMaterialSystem = NULL;
 	g_pHammer = NULL;
 
-#ifdef WIN32
+	#ifdef WIN32
 	CoUninitialize();
-#endif
+	#endif
 }
 
 
@@ -884,7 +884,7 @@ void CSourceAppSystemGroup::Destroy()
 const char *CSourceAppSystemGroup::DetermineDefaultMod()
 {
 	if ( !m_bEditMode )
-	{   		 
+	{
 		return CommandLine()->ParmValue( "-game", DEFAULT_HL2_GAMEDIR );
 	}
 	return g_pHammer->GetDefaultMod();
@@ -926,7 +926,7 @@ bool GrabSourceMutex()
 	if( g_MultiRun )
 		return true;
 
-#ifdef WIN32
+	#ifdef WIN32
 	if ( IsPC() )
 	{
 		// don't allow more than one instance to run
@@ -943,7 +943,7 @@ bool GrabSourceMutex()
 
 		return false;
 	}
-#elif defined(POSIX)
+	#elif defined(POSIX)
 
 	// Under OSX use flock in /tmp/source_engine_<game>.lock, create the file if it doesn't exist
 	const char *pchGameParam = CommandLine()->ParmValue( "-game", DEFAULT_HL2_GAMEDIR );
@@ -952,12 +952,12 @@ bool GrabSourceMutex()
 	CRC32_ProcessBuffer( &gameCRC, (void *)pchGameParam, Q_strlen( pchGameParam ) );
 	CRC32_Final( &gameCRC );
 
-#ifdef ANDROID
+	#ifdef ANDROID
 	return true;
-#elif defined (LINUX) || defined(PLATFORM_BSD)
+	#elif defined (LINUX) || defined(PLATFORM_BSD)
 	/*
 	 * Linux
- 	 */
+	 */
 
 	// Check TMPDIR environment variable for temp directory.
 	char *tmpdir = getenv( "TMPDIR" );
@@ -989,10 +989,10 @@ bool GrabSourceMutex()
 	}
 
 	return true;
-#else
+	#else
 	/*
 	 * OSX
- 	 */
+	 */
 	V_snprintf( g_lockFilename, sizeof(g_lockFilename), "/tmp/source_engine_%u.lock", gameCRC );
 
 	g_lockfd = open( g_lockFilename, O_CREAT | O_WRONLY | O_EXLOCK | O_NONBLOCK | O_TRUNC, 0777 );
@@ -1003,7 +1003,7 @@ bool GrabSourceMutex()
 
 		// we leave the file open, under unix rules when we die we'll automatically close and remove the locks
 		return true;
-	}   		 
+	}
 
 	// We were unable to open the file, it should be because we are unable to retain a lock
 	if ( errno != EWOULDBLOCK)
@@ -1012,9 +1012,9 @@ bool GrabSourceMutex()
 	}
 
 	return false;
-#endif // OSX
+	#endif // OSX
 
-#endif // POSIX
+	#endif // POSIX
 	return true;
 }
 
@@ -1023,21 +1023,21 @@ void ReleaseSourceMutex()
 	if( g_MultiRun )
 		return;
 
-#ifdef WIN32
+	#ifdef WIN32
 	if ( IsPC() && g_hMutex )
 	{
 		::ReleaseMutex( g_hMutex );
 		::CloseHandle( g_hMutex );
 		g_hMutex = NULL;
 	}
-#elif defined(POSIX)
+	#elif defined(POSIX)
 	if ( g_lockfd != -1 )
 	{
 		close( g_lockfd );
 		g_lockfd = -1;
-		unlink( g_lockFilename ); 
+		unlink( g_lockFilename );
 	}
-#endif
+	#endif
 }
 
 // Remove all but the last -game parameter.
@@ -1068,13 +1068,13 @@ void RemoveSpuriousGameParameters()
 }
 
 /*
-============
-va
+ = *===========
+ va
 
-does a varargs printf into a temp buffer, so I don't need to have
-varargs versions of all text functions.
-============
-*/
+ does a varargs printf into a temp buffer, so I don't need to have
+ varargs versions of all text functions.
+ ============
+ */
 static char *va( char *format, ... )
 {
 	va_list		argptr;
@@ -1087,12 +1087,12 @@ static char *va( char *format, ... )
 	Q_vsnprintf( string[curstring], sizeof( string[curstring] ), format, argptr );
 	va_end (argptr);
 
-	return string[curstring];  
+	return string[curstring];
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *param - 
+// Purpose:
+// Input  : *param -
 // Output : static char const
 //-----------------------------------------------------------------------------
 static char const *Cmd_TranslateFileAssociation(char const *param )
@@ -1103,9 +1103,9 @@ static char const *Cmd_TranslateFileAssociation(char const *param )
 	char temp[ 512 ];
 	Q_strncpy( temp, param, sizeof( temp ) );
 	Q_FixSlashes( temp );
-#ifdef WIN32
+	#ifdef WIN32
 	Q_strlower( temp );
-#endif
+	#endif
 	const char *extension = V_GetFileExtension(temp);
 	// must have an extension to map
 	if (!extension)
@@ -1117,17 +1117,17 @@ static char const *Cmd_TranslateFileAssociation(char const *param )
 	{
 		FileAssociationInfo& info = g_FileAssociations[ i ];
 
-		if ( ! Q_strcmp( extension, info.extension ) && 
+		if ( ! Q_strcmp( extension, info.extension ) &&
 			! CommandLine()->FindParm(va( "+%s", info.command_to_issue ) ) )
 		{
-			// Translate if haven't already got one of these commands			
+			// Translate if haven't already got one of these commands
 			Q_strncpy( sz, temp, sizeof( sz ) );
 			Q_FileBase( sz, temp, sizeof( sz ) );
 
 			Q_snprintf( sz, sizeof( sz ), "%s %s", info.command_to_issue, temp );
 			retval = sz;
 			break;
-		}		
+		}
 	}
 
 	// return null if no translation, otherwise return commands
@@ -1136,7 +1136,7 @@ static char const *Cmd_TranslateFileAssociation(char const *param )
 
 //-----------------------------------------------------------------------------
 // Purpose: Converts all the convar args into a convar command
-// Input  : none 
+// Input  : none
 // Output : const char * series of convars
 //-----------------------------------------------------------------------------
 static const char *BuildCommand()
@@ -1150,7 +1150,7 @@ static const char *BuildCommand()
 		const char *szParm = CommandLine()->GetParm(i);
 		if (!szParm) continue;
 
-		if (szParm[0] == '-') 
+		if (szParm[0] == '-')
 		{
 			// skip -XXX options and eat their args
 			const char *szValue = CommandLine()->ParmValue(szParm);
@@ -1172,7 +1172,7 @@ static const char *BuildCommand()
 				build.PutChar(';');
 			}
 		}
-		else 
+		else
 		{
 			// singleton values, convert to command
 			char const *translated = Cmd_TranslateFileAssociation( CommandLine()->GetParm( i ) );
@@ -1193,10 +1193,10 @@ extern void InitGL4ES();
 
 //-----------------------------------------------------------------------------
 // Purpose: The real entry point for the application
-// Input  : hInstance - 
-//			hPrevInstance - 
-//			lpCmdLine - 
-//			nCmdShow - 
+// Input  : hInstance -
+//			hPrevInstance -
+//			lpCmdLine -
+//			nCmdShow -
 // Output : int APIENTRY
 //-----------------------------------------------------------------------------
 #ifdef WIN32
@@ -1205,7 +1205,7 @@ DLL_EXPORT int LauncherMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR
 DLL_EXPORT int LauncherMain( int argc, char **argv )
 #endif
 {
-#if (defined(LINUX) || defined(PLATFORM_BSD)) && !defined ANDROID
+	#if (defined(LINUX) || defined(PLATFORM_BSD)) && !defined ANDROID
 	// Temporary fix to stop us from crashing in printf/sscanf functions that don't expect
 	//  localization to mess with your "." and "," float seperators. Mac OSX also sets LANG
 	//  to en_US.UTF-8 before starting up (in info.plist I believe).
@@ -1224,21 +1224,24 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 		Msg( "WARNING: setlocale('%s') failed, using locale:'%s'. International characters may not work.\n", en_US, CurrentLocale );
 	}
 
-#endif // LINUX
+	#endif // LINUX
 
-#ifdef USE_SDL
+	#ifdef USE_SDL
 	SDL_version ver;
 	SDL_GetVersion( &ver );
 	Msg("SDL version: %d.%d.%d rev: %s\n", (int)ver.major, (int)ver.minor, (int)ver.patch, SDL_GetRevision());
-#endif
+	#endif
 
-#if (defined LINUX || defined PLATFORM_BSD) && defined USE_SDL && defined TOGLES && !defined ANDROID
+	#if (defined LINUX || defined PLATFORM_BSD) && defined USE_SDL && defined TOGLES && !defined ANDROID
+	#ifndef SDL_HINT_VIDEO_X11_FORCE_EGL
+	#define SDL_HINT_VIDEO_X11_FORCE_EGL "SDL_VIDEO_X11_FORCE_EGL"
+	#endif
 	SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1");
-#endif
+	#endif
 
-#ifdef WIN32
+	#ifdef WIN32
 	SetAppInstance( hInstance );
-#elif defined( POSIX )
+	#elif defined( POSIX )
 	// Store off command line for argument searching
 	Plat_SetCommandLine( BuildCmdLine( argc, argv, false ) );
 
@@ -1249,39 +1252,39 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 		//	seconds which should allow time to attach a debugger.
 		sleep( 5 );
 	}
-#endif
+	#endif
 
 	// Hook the debug output stuff.
 	SpewOutputFunc( LauncherDefaultSpewFunc );
 
-	// Quickly check the hardware key, essentially a warning shot.  
+	// Quickly check the hardware key, essentially a warning shot.
 	if ( !Plat_VerifyHardwareKeyPrompt() )
 	{
 		return -1;
 	}
-	
+
 	const char *filename;
-#ifdef WIN32
+	#ifdef WIN32
 	CommandLine()->CreateCmdLine( IsPC() ? VCRHook_GetCommandLine() : lpCmdLine );
-#else
+	#else
 	CommandLine()->CreateCmdLine( argc, argv );
-#endif
+	#endif
 
 	// No -dxlevel or +mat_hdr_level allowed on POSIX
-#ifdef POSIX	
+	#ifdef POSIX
 	CommandLine()->RemoveParm( "-dxlevel" );
 	CommandLine()->RemoveParm( "+mat_hdr_level" );
 	CommandLine()->RemoveParm( "+mat_dxlevel" );
-#endif
+	#endif
 
-	// If we're using -default command line parameters, get rid of DX8 settings. 
+	// If we're using -default command line parameters, get rid of DX8 settings.
 	if ( CommandLine()->CheckParm( "-default" ) )
 	{
 		CommandLine()->RemoveParm( "-dxlevel" );
 		CommandLine()->RemoveParm( "-maxdxlevel" );
 		CommandLine()->RemoveParm( "+mat_dxlevel" );
 	}
-	
+
 	// Figure out the directory the executable is running from
 	UTIL_ComputeBaseDir();
 
@@ -1289,19 +1292,19 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	// Useful for side-by-side comparisons of different renderers.
 	g_MultiRun = CommandLine()->CheckParm( "-multirun" ) != NULL;
 
-#if defined( _X360 )
+	#if defined( _X360 )
 	bool bSpewDllInfo = CommandLine()->CheckParm( "-dllinfo" );
 	bool bWaitForConsole = CommandLine()->CheckParm( "-vxconsole" );
 	XboxConsoleInit();
 	XBX_InitConsoleMonitor( bWaitForConsole || bSpewDllInfo );
-#endif
+	#endif
 
 
-#if defined( _X360 )
+	#if defined( _X360 )
 	if ( bWaitForConsole )
 		COM_TimestampedLog( "LauncherMain: Application Start - %s", CommandLine()->GetCmdLine() );
 	if ( bSpewDllInfo )
-	{	
+	{
 		XBX_DumpDllInfo( GetBaseDirectory() );
 		Error( "Stopped!\n" );
 	}
@@ -1336,17 +1339,17 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 		}
 	}
 	XBX_SetPrimaryUserId( userID );
-#endif // defined( _X360 )
-	
-#ifdef POSIX
+	#endif // defined( _X360 )
+
+	#ifdef POSIX
 	{
 		struct stat st;
-		if ( stat( RELAUNCH_FILE, &st ) == 0 ) 
+		if ( stat( RELAUNCH_FILE, &st ) == 0 )
 		{
 			unlink( RELAUNCH_FILE );
 		}
 	}
-#endif
+	#endif
 
 	// This call is to emulate steam's injection of the GameOverlay DLL into our process if we
 	// are running from the command line directly, this allows the same experience the user gets
@@ -1374,7 +1377,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	// See the function for why we do this.
 	RemoveSpuriousGameParameters();
 
-#ifdef WIN32
+	#ifdef WIN32
 	if ( IsPC() )
 	{
 		// initialize winsock
@@ -1385,7 +1388,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 			Msg( "Warning! Failed to start Winsock via WSAStartup = 0x%x.\n", nError);
 		}
 	}
-#endif
+	#endif
 
 	// Run in text mode? (No graphics or sound).
 	if ( CommandLine()->CheckParm( "-textmode" ) )
@@ -1393,7 +1396,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 		g_bTextMode = true;
 		InitTextMode();
 	}
-#ifdef WIN32
+	#ifdef WIN32
 	else
 	{
 		int retval = -1;
@@ -1412,7 +1415,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 					::MessageBox( NULL, "The modified entity keyvalues could not be sent to the Source Engine because the engine does not appear to be running.", "Source Engine Not Running", MB_OK | MB_ICONEXCLAMATION );
 				}
 				else
-				{			
+				{
 					const char *szCommand = BuildCommand();
 
 					//
@@ -1447,7 +1450,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 			}
 		}
 	}
-#elif defined( POSIX )
+	#elif defined( POSIX )
 	else
 	{
 		if ( !GrabSourceMutex() && !g_MultiRun )
@@ -1456,9 +1459,9 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 			return -1;
 		}
 	}
-#endif
+	#endif
 
-#ifdef WIN32
+	#ifdef WIN32
 	// Make low priority?
 	if ( CommandLine()->CheckParm( "-low" ) )
 	{
@@ -1468,7 +1471,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 	{
 		SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS );
 	}
-#endif
+	#endif
 
 	// If game is not run from Steam then add -insecure in order to avoid client timeout message
 	if ( NULL == CommandLine()->CheckParm( "-steam" ) )
@@ -1506,7 +1509,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 			bReslistCycle = reslistgenerator->ShouldContinue();
 			bRestart = bReslistCycle;
 		}
-		
+
 		if ( !bReslistCycle )
 		{
 			// Remove any overrides in case settings changed
@@ -1526,7 +1529,7 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 		}
 	}
 
-#ifdef WIN32
+	#ifdef WIN32
 	if ( IsPC() )
 	{
 		// shutdown winsock
@@ -1536,16 +1539,16 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 			Msg( "Warning! Failed to complete WSACleanup = 0x%x.\n", nError );
 		}
 	}
-#endif
+	#endif
 
 	// Allow other source apps to run
 	ReleaseSourceMutex();
 
-#if defined( WIN32 ) && !defined( _X360 )
+	#if defined( WIN32 ) && !defined( _X360 )
 
 	// Now that the mutex has been released, check HKEY_CURRENT_USER\Software\Valve\Source\Relaunch URL. If there is a URL here, exec it.
-	// This supports the capability of immediately re-launching the the game via Steam in a different audio language 
-	HKEY hKey; 
+	// This supports the capability of immediately re-launching the the game via Steam in a different audio language
+	HKEY hKey;
 	if ( RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL, KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS )
 	{
 		char szValue[MAX_PATH];
@@ -1560,9 +1563,9 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 		RegCloseKey(hKey);
 	}
 
-#elif defined( OSX ) || defined( LINUX ) || defined(PLATFORM_BSD)
+	#elif defined( OSX ) || defined( LINUX ) || defined(PLATFORM_BSD)
 	struct stat st;
-	if ( stat( RELAUNCH_FILE, &st ) == 0 ) 
+	if ( stat( RELAUNCH_FILE, &st ) == 0 )
 	{
 		FILE *fp = fopen( RELAUNCH_FILE, "r" );
 		if ( fp )
@@ -1578,9 +1581,9 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 				szCmd[nChars] = 0;
 				char szOpenLine[ MAX_PATH ];
 				#if defined( LINUX ) || defined(PLATFORM_BSD)
-					Q_snprintf( szOpenLine, sizeof(szOpenLine), "xdg-open \"%s\"", szCmd );
+				Q_snprintf( szOpenLine, sizeof(szOpenLine), "xdg-open \"%s\"", szCmd );
 				#else
-					Q_snprintf( szOpenLine, sizeof(szOpenLine), "open \"%s\"", szCmd );
+				Q_snprintf( szOpenLine, sizeof(szOpenLine), "open \"%s\"", szCmd );
 				#endif
 				system( szOpenLine );
 			}
@@ -1588,10 +1591,10 @@ DLL_EXPORT int LauncherMain( int argc, char **argv )
 			unlink( RELAUNCH_FILE );
 		}
 	}
-#elif defined( _X360 )
-#else
-#error
-#endif
+	#elif defined( _X360 )
+	#else
+	#error
+	#endif
 
 	return 0;
 }
